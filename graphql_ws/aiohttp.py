@@ -56,7 +56,7 @@ class AiohttpSubscriptionServer(BaseSubscriptionServer):
                 self.on_close(connection_context)
                 return
 
-            ensure_future(self.on_message(connection_context, message))
+            await self.on_message(connection_context, message)
 
     async def on_open(self, connection_context):
         pass

@@ -76,7 +76,7 @@ class BaseSubscriptionServer(object):
             message['payload'] = payload
         return message
 
-    def process_message(self, connection_context, parsed_message):
+    async def process_message(self, connection_context, parsed_message):
         op_id = parsed_message.get('id')
         op_type = parsed_message.get('type')
         payload = parsed_message.get('payload')
@@ -101,7 +101,7 @@ class BaseSubscriptionServer(object):
             if connection_context.has_operation(op_id):
                 self.unsubscribe(connection_context, op_id)
 
-            return self.on_start(connection_context, op_id, params)
+            return await self.on_start(connection_context, op_id, params)
 
         elif op_type == GQL_STOP:
             return self.on_stop(connection_context, op_id)
@@ -177,7 +177,7 @@ class BaseSubscriptionServer(object):
     def handle(self, ws, request_context=None):
         raise NotImplementedError("handle method not implemented")
 
-    def on_message(self, connection_context, message):
+    async def on_message(self, connection_context, message):
         try:
             parsed_message = json.loads(message)
             assert isinstance(
@@ -185,7 +185,7 @@ class BaseSubscriptionServer(object):
         except Exception as e:
             return self.send_error(connection_context, None, e)
 
-        return self.process_message(connection_context, parsed_message)
+        return await self.process_message(connection_context, parsed_message)
 
     def on_open(self, connection_context):
         raise NotImplementedError("on_open method not implemented")
